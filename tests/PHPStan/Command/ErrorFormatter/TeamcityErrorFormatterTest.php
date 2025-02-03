@@ -18,6 +18,7 @@ class TeamcityErrorFormatterTest extends ErrorFormatterTestCase
 			0,
 			0,
 			'',
+			'',
 		];
 
 		yield [
@@ -78,16 +79,27 @@ class TeamcityErrorFormatterTest extends ErrorFormatterTestCase
 ##teamcity[inspection typeId=\'phpstan\' message=\'second generic<error>\' file=\'.\' SEVERITY=\'ERROR\']
 ',
 		];
+
+		yield [
+			'One file error',
+			1,
+			[4, 2],
+			0,
+			'##teamcity[inspectionType id=\'phpstan\' name=\'phpstan\' category=\'phpstan\' description=\'phpstan Inspection\']
+##teamcity[inspection typeId=\'phpstan\' message=\'Bar||nBar2\' file=\'foo.php\' line=\'\' SEVERITY=\'ERROR\' ignorable=\'1\' tip=\'\']
+##teamcity[inspection typeId=\'phpstan\' message=\'Foobar\Buz (🪪 foobar.buz)\' file=\'foo.php\' line=\'5\' SEVERITY=\'ERROR\' ignorable=\'1\' tip=\'a tip\']
+',
+		];
 	}
 
 	/**
 	 * @dataProvider dataFormatterOutputProvider
-	 *
+	 * @param array{int, int}|int $numFileErrors
 	 */
 	public function testFormatErrors(
 		string $message,
 		int $exitCode,
-		int $numFileErrors,
+		array|int $numFileErrors,
 		int $numGenericErrors,
 		string $expected,
 	): void

@@ -10,6 +10,7 @@ use function array_values;
 use function count;
 use function is_string;
 use function preg_replace;
+use function sprintf;
 use const PHP_EOL;
 
 /**
@@ -41,9 +42,15 @@ final class TeamcityErrorFormatter implements ErrorFormatter
 		]);
 
 		foreach ($fileSpecificErrors as $fileSpecificError) {
+			$message = $fileSpecificError->getMessage();
+
+			if ($fileSpecificError->getIdentifier() !== null && $fileSpecificError->canBeIgnored()) {
+				$message .= sprintf(' (🪪 %s)', $fileSpecificError->getIdentifier());
+			}
+
 			$result .= $this->createTeamcityLine('inspection', [
 				'typeId' => 'phpstan',
-				'message' => $fileSpecificError->getMessage(),
+				'message' => $message,
 				'file' => $this->relativePathHelper->getRelativePath($fileSpecificError->getFile()),
 				'line' => $fileSpecificError->getLine(),
 				// additional attributes
